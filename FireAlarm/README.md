@@ -1,6 +1,124 @@
 # FireAlarm
 
 Compact Fire Alarm prototype using PlatformIO and an ESP-based microcontroller.
+This repository contains firmware (PlatformIO) for a small fire/smoke alarm system. It reads one or more environmental sensors (smoke, flame, temperature), triggers a siren/buzzer and visual indicator, and exposes simple serial logs for debugging.
+
+## What this repo contains
+- `src/main.cpp` — main firmware. Edit pin definitions and thresholds here.
+- `platformio.ini` — build configuration for PlatformIO (check environments and board type).
+- `lib/` and `include/` — additional libraries and headers (if used).
+## Features
+
+- Reads smoke / flame / temperature sensors
+- Activates a buzzer/siren and LED when an alarm condition is detected
+- Serial debug output for development and troubleshooting
+## Hardware (suggested)
+
+The exact board and components depend on your setup. Typical components:
+
+- ESP32 or ESP8266 development board (for example: ESP32-WROOM) — check `platformio.ini` for the configured board.
+- Smoke sensor (e.g. MQ-2, MQ-135 or equivalent)
+- KY-026 Flame sensor (common flame/IR detector module; provides digital and often analog output)
+- KY-035 Analog Hall-effect (magnetic) sensor — used here as a magnetic-door sensor to detect the presence/state of a magnetic contact or lock
+- Buzzer or small siren (active or driven by transistor). A generic active piezo buzzer is typically used; add a specific model if preferred.
+- Status LED (with resistor)
+- Relay module (optional) if you need to switch mains-powered siren or other high-voltage equipment
+- Wires, breadboard, and suitable power supply (5V/3.3V depending on sensors and board)
+## Typical wiring / pinout
+
+Update these to match your `src/main.cpp` pin definitions. The pins below match the firmware defaults used in this repository:
+
+| Component        | Pin on ESP32 |
+| ---------------- | ------------ |
+| Flame Digital    | 23           |
+| Flame Analog     | 34           |
+| Hall Analog      | 35           |
+| Fire LED         | 5            |
+| Magnetic LED     | 18           |
+| Buzzer           | 19           |
+
+Always confirm voltage levels: many sensors expect 5V while ESP boards are 3.3V. Use level shifting or run sensors at compatible voltages.
+## Quick start — build & flash (PlatformIO)
+
+Open the project in VS Code with the PlatformIO extension, or use the command line in the project root.
+
+Build the firmware:
+
+```zsh
+pio run
+```
+
+Build and upload to the connected board (uses the default environment in `platformio.ini`):
+
+```zsh
+pio run -t upload
+```
+
+If you have multiple environments or a specific env name, pass `-e <env_name>`.
+
+Open the serial monitor to view debug logs (common baud rate is 115200):
+
+```zsh
+pio device monitor -b 115200
+```
+
+If you're using VS Code, you can also use the PlatformIO GUI commands (Build / Upload / Monitor).
+### Quick start — Arduino IDE
+
+1. Open `ESP32_DualSensor_Alarm.ino` (or port `src/main.cpp`) in Arduino IDE.
+  - Alternatively, create a new sketch in Arduino IDE and paste the contents of `src/main.cpp` into it, then save and upload.
+2. Select the correct ESP32 board and serial port.
+3. Upload the sketch.
+4. Open Serial Monitor at 115200 baud.
+
+To use Bluetooth features, pair with the device name `ESP32_Security` (or the Bluetooth name set in your firmware).
+## 💻 Software & Libraries
+
+- PlatformIO (recommended) or Arduino IDE
+- ESP32 board support installed
+- `BluetoothSerial.h` library (included with the ESP32 Arduino core)
+
+This repository is set up for PlatformIO. If you prefer Arduino IDE, you can port `src/main.cpp` to an `.ino` file (example name used elsewhere: `ESP32_DualSensor_Alarm.ino`).
+## Troubleshooting
+
+- Upload fails:
+  - Ensure the correct serial port is selected. Use `pio device list` or your OS device manager.
+  - Install USB drivers if required (CP210x, CH34x, etc.).
+  - Some boards need manual boot mode (hold BOOT while pressing EN) for flashing.
+
+- No or garbled serial output:
+  - Verify baud rate (115200) and correct port.
+
+- Bluetooth pairing problems:
+  - Ensure the ESP32 has `BluetoothSerial` initialized and the device name matches `ESP32_Security`.
+  - On some phones re-pair after rebooting the ESP32.
+
+- Inaccurate sensor readings:
+  - Check wiring, power, and grounding.
+  - Allow sensors to warm up if required by the datasheet.
+## Development tips
+
+- Add debug prints to `src/main.cpp` for raw sensor values and state transitions.
+- Keep alarm handling non-blocking so Bluetooth/serial remain responsive.
+- Consider adding OTA updates, watchdog timers, and persistent logging for production builds.
+## Contributing
+
+Contributions are welcome. Open issues for bugs or feature requests. Send pull requests with concise descriptions and test steps.
+
+---
+
+## 📝 License
+
+This project is open-source under the MIT License. See the LICENSE file or add one to the repository.
+
+---
+
+## 🎯 Author
+
+Created by **George Lukaanya** – ESP32 developer & embedded systems enthusiast.
+# FireAlarm
+
+Compact Fire Alarm prototype using PlatformIO and an ESP-based microcontroller.
 
 This repository contains firmware (PlatformIO) for a small fire/smoke alarm system. It reads one or more environmental sensors (smoke, flame, temperature), triggers a siren/buzzer and visual indicator, and exposes simple serial logs for debugging.
 
@@ -22,24 +140,16 @@ The exact board and components depend on your setup. Typical components:
 
 - ESP32 or ESP8266 development board (for example: ESP32-WROOM) — check `platformio.ini` for the configured board.
 - Smoke sensor (e.g. MQ-2, MQ-135 or equivalent)
-- (Optional) Flame sensor / IR sensor
-- Buzzer or small siren (active or driven by transistor)
 - Status LED (with resistor)
 - Relay module (optional) if you need to switch mains-powered siren or other high-voltage equipment
 - Wires, breadboard, and suitable power supply (5V/3.3V depending on sensors and board)
-
-## Typical wiring / pinout
-
-Update these to match your `src/main.cpp` pin definitions. The pins below are examples only:
-
-- Smoke sensor analog output -> A0 (ADC pin on your board)
-- Flame sensor digital out -> D2
-- Buzzer (active) -> D5 (or a transistor driving the buzzer from a GPIO)
-- Status LED -> D4 (through 220Ω resistor)
-- Relay IN -> D12
-- VCC / GND -> match sensor and board voltage requirements
-
-Always confirm voltage levels: many sensors expect 5V while ESP boards are 3.3V. Use level shifting or run sensors at compatible voltages.
+ - Smoke sensor (e.g. MQ-2, MQ-135 or equivalent)
+ - KY-026 Flame sensor (common flame/IR detector module; provides digital and often analog output)
+ - KY-035 Analog Hall-effect (magnetic) sensor — used here as a magnetic-door sensor to detect the presence/state of a magnetic contact or lock
+ - Buzzer or small siren (active or driven by transistor). A generic active piezo buzzer is typically used; add a specific model if preferred.
+ - Status LED (with resistor)
+ - Relay module (optional) if you need to switch mains-powered siren or other high-voltage equipment
+ - Wires, breadboard, and suitable power supply (5V/3.3V depending on sensors and board)
 
 ## Quick start — build & flash (PlatformIO)
 
@@ -91,8 +201,9 @@ An ESP32-based dual-sensor alert system with Bluetooth monitoring, designed to d
   - Buzzer pulses in sync with the LED
 
 - Magnetic Field Detection
-  - KY-035 Hall effect sensor
+  - KY-035 analog Hall-effect (magnetic) sensor
   - Magnetic alert LED lights up
+  - Intended door-release behavior: in a full deployment the KY-035 monitors a door's magnetic contact or magnetic lock. When a fire is detected the system is intended to release (unlock) the magnetic door lock to allow the door to open and provide an escape route for people inside. IMPORTANT: the mechanical/electrical door-release (lock-release) mechanism is not implemented in this repository because we had no door or magnetic lock available to test with — only the sensor-reading and alert logic are implemented here.
 
 - Bluetooth Control
   - Connect via classic Bluetooth (SPP)
