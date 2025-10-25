@@ -1,396 +1,218 @@
-# FireAlarm
+# 🔥 FireAlarm — ESP32 Dual-Sensor Alert System
 
-Compact Fire Alarm prototype using PlatformIO and an ESP-based microcontroller.
-This repository contains firmware (PlatformIO) for a small fire/smoke alarm system. It reads one or more environmental sensors (smoke, flame, temperature), triggers a siren/buzzer and visual indicator, and exposes simple serial logs for debugging.
-
-## What this repo contains
-- `src/main.cpp` — main firmware. Edit pin definitions and thresholds here.
-- `platformio.ini` — build configuration for PlatformIO (check environments and board type).
-- `lib/` and `include/` — additional libraries and headers (if used).
-## Features
-
-- Reads smoke / flame / temperature sensors
-- Activates a buzzer/siren and LED when an alarm condition is detected
-- Serial debug output for development and troubleshooting
-## Hardware (suggested)
-
-The exact board and components depend on your setup. Typical components:
-
-- ESP32 or ESP8266 development board (for example: ESP32-WROOM) — check `platformio.ini` for the configured board.
-- Smoke sensor (e.g. MQ-2, MQ-135 or equivalent)
-- KY-026 Flame sensor (common flame/IR detector module; provides digital and often analog output)
-- KY-035 Analog Hall-effect (magnetic) sensor — used here as a magnetic-door sensor to detect the presence/state of a magnetic contact or lock
-- Buzzer or small siren (active or driven by transistor). A generic active piezo buzzer is typically used; add a specific model if preferred.
-- Status LED (with resistor)
-- Relay module (optional) if you need to switch mains-powered siren or other high-voltage equipment
-- Wires, breadboard, and suitable power supply (5V/3.3V depending on sensors and board)
-## Typical wiring / pinout
-
-Update these to match your `src/main.cpp` pin definitions. The pins below match the firmware defaults used in this repository:
-
-| Component        | Pin on ESP32 |
-| ---------------- | ------------ |
-| Flame Digital    | 23           |
-| Flame Analog     | 34           |
-| Hall Analog      | 35           |
-| Fire LED         | 5            |
-| Magnetic LED     | 18           |
-| Buzzer           | 19           |
-
-Always confirm voltage levels: many sensors expect 5V while ESP boards are 3.3V. Use level shifting or run sensors at compatible voltages.
-## Quick start — build & flash (PlatformIO)
-
-Open the project in VS Code with the PlatformIO extension, or use the command line in the project root.
-
-Build the firmware:
-
-```zsh
-pio run
-```
-
-Build and upload to the connected board (uses the default environment in `platformio.ini`):
-
-```zsh
-pio run -t upload
-```
-
-If you have multiple environments or a specific env name, pass `-e <env_name>`.
-
-Open the serial monitor to view debug logs (common baud rate is 115200):
-
-```zsh
-pio device monitor -b 115200
-```
-
-If you're using VS Code, you can also use the PlatformIO GUI commands (Build / Upload / Monitor).
-### Quick start — Arduino IDE
-
-1. Open `ESP32_DualSensor_Alarm.ino` (or port `src/main.cpp`) in Arduino IDE.
-  - Alternatively, create a new sketch in Arduino IDE and paste the contents of `src/main.cpp` into it, then save and upload.
-2. Select the correct ESP32 board and serial port.
-3. Upload the sketch.
-4. Open Serial Monitor at 115200 baud.
-
-To use Bluetooth features, pair with the device name `ESP32_Security` (or the Bluetooth name set in your firmware).
-## 💻 Software & Libraries
-
-- PlatformIO (recommended) or Arduino IDE
-- ESP32 board support installed
-- `BluetoothSerial.h` library (included with the ESP32 Arduino core)
-
-This repository is set up for PlatformIO. If you prefer Arduino IDE, you can port `src/main.cpp` to an `.ino` file (example name used elsewhere: `ESP32_DualSensor_Alarm.ino`).
-## Troubleshooting
-
-- Upload fails:
-  - Ensure the correct serial port is selected. Use `pio device list` or your OS device manager.
-  - Install USB drivers if required (CP210x, CH34x, etc.).
-  - Some boards need manual boot mode (hold BOOT while pressing EN) for flashing.
-
-- No or garbled serial output:
-  - Verify baud rate (115200) and correct port.
-
-- Bluetooth pairing problems:
-  - Ensure the ESP32 has `BluetoothSerial` initialized and the device name matches `ESP32_Security`.
-  - On some phones re-pair after rebooting the ESP32.
-
-- Inaccurate sensor readings:
-  - Check wiring, power, and grounding.
-  - Allow sensors to warm up if required by the datasheet.
-## Development tips
-
-- Add debug prints to `src/main.cpp` for raw sensor values and state transitions.
-- Keep alarm handling non-blocking so Bluetooth/serial remain responsive.
-- Consider adding OTA updates, watchdog timers, and persistent logging for production builds.
-## Contributing
-
-Contributions are welcome. Open issues for bugs or feature requests. Send pull requests with concise descriptions and test steps.
+A **compact fire and magnetic alert system** built on **PlatformIO** and **ESP32**.
+This firmware reads **flame (KY-026)** and **magnetic (KY-035)** sensors, triggers an **LED and buzzer alarm**, and supports **Bluetooth-based monitoring and control**.
 
 ---
 
-## 📝 License
+## 🧭 Overview
 
-This project is open-source under the MIT License. See the LICENSE file or add one to the repository.
+This project demonstrates how to build a **dual-sensor emergency alert system** capable of detecting fire and magnetic field events.
+It can be integrated into **safety doors, smart alarms, or IoT-based monitoring systems**.
 
----
+When a fire is detected, the system:
 
-## 🎯 Author
-
-Created by **George Lukaanya** – ESP32 developer & embedded systems enthusiast.
-# FireAlarm
-
-Compact Fire Alarm prototype using PlatformIO and an ESP-based microcontroller.
-
-This repository contains firmware (PlatformIO) for a small fire/smoke alarm system. It reads one or more environmental sensors (smoke, flame, temperature), triggers a siren/buzzer and visual indicator, and exposes simple serial logs for debugging.
-
-## What this repo contains
-
-- `src/main.cpp` — main firmware. Edit pin definitions and thresholds here.
-- `platformio.ini` — build configuration for PlatformIO (check environments and board type).
-- `lib/` and `include/` — additional libraries and headers (if used).
-
-## Features
-
-- Reads smoke / flame / temperature sensors
-- Activates a buzzer/siren and LED when an alarm condition is detected
-- Serial debug output for development and troubleshooting
-
-## Hardware (suggested)
-
-The exact board and components depend on your setup. Typical components:
-
-- ESP32 or ESP8266 development board (for example: ESP32-WROOM) — check `platformio.ini` for the configured board.
-- Smoke sensor (e.g. MQ-2, MQ-135 or equivalent)
-- Status LED (with resistor)
-- Relay module (optional) if you need to switch mains-powered siren or other high-voltage equipment
-- Wires, breadboard, and suitable power supply (5V/3.3V depending on sensors and board)
- - Smoke sensor (e.g. MQ-2, MQ-135 or equivalent)
- - KY-026 Flame sensor (common flame/IR detector module; provides digital and often analog output)
- - KY-035 Analog Hall-effect (magnetic) sensor — used here as a magnetic-door sensor to detect the presence/state of a magnetic contact or lock
- - Buzzer or small siren (active or driven by transistor). A generic active piezo buzzer is typically used; add a specific model if preferred.
- - Status LED (with resistor)
- - Relay module (optional) if you need to switch mains-powered siren or other high-voltage equipment
- - Wires, breadboard, and suitable power supply (5V/3.3V depending on sensors and board)
-
-## Quick start — build & flash (PlatformIO)
-
-Open the project in VS Code with the PlatformIO extension, or use the command line in the project root.
-
-Build the firmware:
-
-```zsh
-pio run
-```
-
-Build and upload to the connected board (uses the default environment in `platformio.ini`):
-
-```zsh
-pio run -t upload
-```
-
-If you have multiple environments or a specific env name, pass `-e <env_name>`.
-
-Open the serial monitor to view debug logs (common baud rate is 115200):
-
-```zsh
-pio device monitor -b 115200
-```
-
-If you're using VS Code, you can also use the PlatformIO GUI commands (Build / Upload / Monitor).
-
-## Configuration
-
-- Change pin assignments, thresholds and behavior in `src/main.cpp`. Search for clearly named constants like `SMOKE_PIN`, `BUZZER_PIN`, `ALARM_THRESHOLD`.
-- Check and edit `platformio.ini` if you need to change board, upload speed, or environment settings.
-
-## Testing
-
-- With the board connected and serial monitor open, trigger the sensor (e.g., place a small amount of cigarette smoke or use a lighter briefly at a safe distance). The sensor reading should rise — observe serial logs to see values and whether the alarm triggers.
-- For buzzer/LED testing, you can temporarily force the alarm state in `src/main.cpp` to validate wiring without triggering sensors.
-
-# ESP32 Dual-Sensor Alert System
-
-An ESP32-based dual-sensor alert system with Bluetooth monitoring, designed to detect fire and magnetic field events. The system features blinking fire LED with pulsing buzzer, magnetic alerts, and real-time status updates via Bluetooth.
+* Blinks a red LED and pulses the buzzer.
+* Sends alerts via Serial Monitor and Bluetooth.
+* Allows remote acknowledgment or reset through Bluetooth commands.
 
 ---
 
-## 🔥 Features
+## 📂 Repository Contents
 
-- Fire Detection
-  - KY-026 flame sensor
-  - Fire LED blinks in an alarm pattern
-  - Buzzer pulses in sync with the LED
-
-- Magnetic Field Detection
-  - KY-035 analog Hall-effect (magnetic) sensor
-  - Magnetic alert LED lights up
-  - Intended door-release behavior: in a full deployment the KY-035 monitors a door's magnetic contact or magnetic lock. When a fire is detected the system is intended to release (unlock) the magnetic door lock to allow the door to open and provide an escape route for people inside. IMPORTANT: the mechanical/electrical door-release (lock-release) mechanism is not implemented in this repository because we had no door or magnetic lock available to test with — only the sensor-reading and alert logic are implemented here.
-
-- Bluetooth Control
-  - Connect via classic Bluetooth (SPP)
-  - Send commands:
-    - `ack` → silence alarms
-    - `status` → request current sensor readings
-    - `cal` → recalibrate sensors
-    - `reset` → re-enable alarms
-
-- Real-time monitoring via Serial Monitor or Bluetooth-connected mobile app
+| File/Folder           | Description                                                            |
+| --------------------- | ---------------------------------------------------------------------- |
+| `src/main.cpp`        | Main firmware — edit pin definitions, thresholds, and logic here       |
+| `platformio.ini`      | PlatformIO build configuration (defines board, environment, libraries) |
+| `lib/` and `include/` | Optional custom libraries and header files                             |
+| `README.md`           | Project documentation (this file)                                      |
 
 ---
 
-## 🛠️ Hardware Required
+## ✨ Features
 
-- ESP32 WROOM-32
-- KY-026 Flame Sensor
-- KY-035 Hall Effect Sensor
-- LEDs (Fire & Magnetic indicators)
-- Buzzer
-- Jumper wires and breadboard (or PCB for final design)
+* 🔥 **Flame Detection** (KY-026 Sensor)
+  Detects infrared light from fire sources. Blinks LED and activates buzzer.
 
-**Pin Configuration (as used in the code):**
+* 🧲 **Magnetic Field Detection** (KY-035 Sensor)
+  Detects the presence of magnetic fields (door lock or contact sensors).
 
-| Component        | Pin on ESP32 |
-| ---------------- | ------------ |
-| Flame Digital    | 23           |
-| Flame Analog     | 34           |
-| Hall Analog      | 35           |
-| Fire LED         | 5            |
-| Magnetic LED     | 18           |
-| Buzzer           | 19           |
+* 📶 **Bluetooth Monitoring**
+  Connect via classic Bluetooth SPP (`ESP32_Security`) to:
 
-> Note: These pin assignments match the repository's firmware by default. If your hardware differs, update the pins in `src/main.cpp`.
+  * Receive real-time alerts.
+  * Send commands: `ack`, `status`, `cal`, `reset`.
+
+* 💡 **LED Indicators**
+  Separate LEDs for fire and magnetic alerts.
+
+* 🧠 **Non-blocking alarm handling**
+  Keeps Bluetooth and Serial responsive during alerts.
 
 ---
 
-## 💻 Software & Libraries
+## 🛠️ Hardware Setup
 
-- PlatformIO (recommended) or Arduino IDE
-- ESP32 board support installed
-- `BluetoothSerial.h` library (included with the ESP32 Arduino core)
+| Component                    | ESP32 Pin | Description                            |
+| ---------------------------- | --------- | -------------------------------------- |
+| Flame Sensor (Digital Out)   | 23        | Detects fire (LOW when flame detected) |
+| Flame Sensor (Analog Out)    | 34        | Measures flame intensity               |
+| Magnetic Sensor (Analog Out) | 35        | Detects magnetic field strength        |
+| Fire LED                     | 5         | Indicates flame alert                  |
+| Magnetic LED                 | 18        | Indicates magnetic field presence      |
+| Buzzer                       | 19        | Sound alarm output                     |
 
-This repository is set up for PlatformIO. If you prefer Arduino IDE, you can port `src/main.cpp` to an `.ino` file (example name used elsewhere: `ESP32_DualSensor_Alarm.ino`).
-
-## Quick start — build & flash (PlatformIO)
-
-Open the project in VS Code with the PlatformIO extension, or use the command line in the project root.
-
-Build the firmware:
-
-```zsh
-pio run
-```
-
-Build and upload to the connected board (uses the default environment in `platformio.ini`):
-
-```zsh
-pio run -t upload
-```
-
-If you have multiple environments or a specific env name, pass `-e <env_name>`.
-
-Open the serial monitor to view debug logs (common baud rate is 115200):
-
-```zsh
-pio device monitor -b 115200
-```
-
-### Quick start — Arduino IDE
-
-1. Open `ESP32_DualSensor_Alarm.ino` (or port `src/main.cpp`) in Arduino IDE.
-2. Select the correct ESP32 board and serial port.
-3. Upload the sketch.
-4. Open Serial Monitor at 115200 baud.
-
-To use Bluetooth features, pair with the device name `ESP32_Security` (or the Bluetooth name set in your firmware).
+> ⚡ Ensure all components are compatible with ESP32’s 3.3V logic.
+> The KY-026 and KY-035 can run on 3.3V or 5V depending on model — verify your module version.
 
 ---
 
-## 📦 Setup & Usage
+## 🔧 Adjusting Sensitivity
 
-1. Connect your ESP32 board and sensors per the pin configuration above.
-2. Build and upload firmware (PlatformIO or Arduino IDE).
-3. Open Serial Monitor at 115200 baud to see sensor readings and status messages.
-4. Pair a Bluetooth device (mobile app or PC) to `ESP32_Security` to receive real-time updates and send commands.
+### KY-026 Flame Sensor
 
-**Bluetooth Commands:**
+* **Clockwise** rotation on the onboard potentiometer → Increases sensitivity.
+* **Counterclockwise** → Decreases sensitivity.
+* Use digital output for ON/OFF flame detection or analog for flame intensity.
 
-| Command  | Description                        |
-| -------- | ---------------------------------- |
-| `ack`    | Silence all alarms (LEDs + buzzer) |
-| `status` | Request current sensor readings    |
-| `cal`    | Recalibrate all sensors            |
-| `reset`  | Re-enable alarms after silence     |
+### KY-035 Hall Effect Sensor
 
----
+* Calibrate the analog threshold in code using:
 
-## 🔧 How it Works
-
-1. **Fire Detection**
-   - Flame LED blinks and buzzer pulses when fire is detected.
-   - The LED and buzzer stop when fire is cleared or system is silenced.
-
-2. **Magnetic Detection**
-   - Magnetic LED lights up when a strong magnetic field is detected.
-
-3. **Sensor Calibration**
-   - Automatically calibrates flame and magnetic sensors on startup or via `cal` command.
-
-4. **Bluetooth Messaging**
-   - Sends human-readable messages:
-     - `🔥 FIRE DETECTED!`
-     - `🧲 Magnetic field detected!`
-     - `✅ NORMAL`
-   - Can be parsed by a mobile app for real-time alerts and UI updates.
+  ```cpp
+  int magneticThreshold = 1800; // Adjust based on your sensor’s readings
+  ```
+* Use a magnet to test detection distance and responsiveness.
 
 ---
 
-## 📱 Mobile App Integration
+## ⚙️ Quick Start — PlatformIO
 
-- App can connect to `ESP32_Security` via Bluetooth.
-- Display real-time sensor status with animations:
-  - Fire: blinking red background + alarm sound
-  - Magnetic: blue pulse animation
-  - Normal: calm green interface
-- Send commands to silence or reset alarms
+1. **Open project** in VS Code with the **PlatformIO extension**.
+2. **Build** the firmware:
 
----
+   ```bash
+   pio run
+   ```
+3. **Upload** to your ESP32 board:
 
-## 📌 Notes
+   ```bash
+   pio run -t upload
+   ```
+4. **Monitor serial output:**
 
-- Adjust `flameThreshold` and `magneticThreshold` if your sensors behave differently.
-- LED blink interval can be changed in the code (`blinkInterval` in `handleFireAlert()`).
-- Ensure your ESP32 board supports Bluetooth SPP.
-- Confirm sensor voltage requirements and use level shifting if mixing 3.3V and 5V components.
+   ```bash
+   pio device monitor -b 115200
+   ```
 
----
-
-## Testing
-
-- With the board connected and serial monitor open, trigger the flame sensor (carefully) and observe serial logs and LED/buzzer behavior.
-- For magnetic testing, bring a magnet near the Hall effect sensor and observe the Magnetic LED and serial messages.
-- Use the `status` Bluetooth command to get live readings from a paired device.
+> You can also use the PlatformIO GUI (Build / Upload / Monitor buttons).
 
 ---
 
-## Troubleshooting
+## 🧠 How It Works
 
-- Upload fails:
-  - Ensure the correct serial port is selected. Use `pio device list` or your OS device manager.
-  - Install USB drivers if required (CP210x, CH34x, etc.).
-  - Some boards need manual boot mode (hold BOOT while pressing EN) for flashing.
+1. The **flame sensor** outputs a LOW signal when infrared light from fire is detected.
+   The system blinks the LED and pulses the buzzer.
 
-- No or garbled serial output:
-  - Verify baud rate (115200) and correct port.
+2. The **magnetic sensor** outputs analog readings depending on magnetic field strength.
+   When readings exceed the set threshold, the magnetic LED turns ON.
 
-- Bluetooth pairing problems:
-  - Ensure the ESP32 has `BluetoothSerial` initialized and the device name matches `ESP32_Security`.
-  - On some phones re-pair after rebooting the ESP32.
+3. **Bluetooth Control**:
+   The ESP32 initializes a Bluetooth SPP connection (`ESP32_Security`), allowing command-based control.
 
-- Inaccurate sensor readings:
-  - Check wiring, power, and grounding.
-  - Allow sensors to warm up if required by the datasheet.
+### Supported Bluetooth Commands
 
----
-
-## Development tips
-
-- Add debug prints to `src/main.cpp` for raw sensor values and state transitions.
-- Keep alarm handling non-blocking so Bluetooth/serial remain responsive.
-- Consider adding OTA updates, watchdog timers, and persistent logging for production builds.
+| Command  | Description                           |
+| -------- | ------------------------------------- |
+| `ack`    | Silence all alarms (LED + buzzer)     |
+| `status` | Report current sensor values          |
+| `cal`    | Recalibrate sensors                   |
+| `reset`  | Re-enable alarms after being silenced |
 
 ---
 
-## Contributing
+## 🔍 Serial & Bluetooth Messages
 
-Contributions are welcome. Open issues for bugs or feature requests. Send pull requests with concise descriptions and test steps.
+* `🔥 FIRE DETECTED!`
+* `🧲 Magnetic field detected!`
+* `✅ System Normal`
+* `🔇 Alarm silenced`
+* `♻️ System reset`
+
+All messages are visible both via **Serial Monitor** and **Bluetooth terminal**.
 
 ---
 
-## 📝 License
+## 📱 Mobile App Integration (Optional)
 
-This project is open-source under the MIT License. See the LICENSE file or add one to the repository.
+A simple Bluetooth terminal app (e.g., **Serial Bluetooth Terminal** for Android) can:
+
+* Display system messages in real-time.
+* Send commands to control the ESP32 remotely.
+* Integrate easily with custom mobile dashboards.
 
 ---
 
-## 🎯 Author
+## 🧪 Testing Procedure
 
-Created by **George Lukaanya** – ESP32 developer & embedded systems enthusiast.
+1. **Flame Sensor Test**
+   Bring a lighter flame near the sensor (without touching it).
+   The **Fire LED** and **buzzer** should trigger, and “🔥 FIRE DETECTED!” should appear in Serial Monitor.
+
+2. **Magnetic Sensor Test**
+   Bring a magnet near the KY-035 sensor.
+   The **Magnetic LED** should turn ON and “🧲 Magnetic field detected!” should appear.
+
+3. **Bluetooth Test**
+   Pair your phone with `ESP32_Security`, open a Bluetooth terminal, and send:
+
+   * `status` → Shows sensor data.
+   * `ack` → Silences alarms.
+   * `reset` → Re-enables them.
+
+---
+
+## 🧰 Troubleshooting
+
+| Issue                   | Possible Cause                                | Fix                                                         |
+| ----------------------- | --------------------------------------------- | ----------------------------------------------------------- |
+| Upload fails            | Wrong serial port / missing drivers           | Check `pio device list` and install CP210x or CH34x drivers |
+| No serial output        | Wrong baud rate                               | Use `115200`                                                |
+| Bluetooth not visible   | Bluetooth not initialized or disabled in code | Ensure `BluetoothSerial.begin("ESP32_Security");` exists    |
+| False fire triggers     | Sensor too sensitive                          | Adjust KY-026 potentiometer or code threshold               |
+| Weak magnetic detection | Sensor too far / wrong polarity               | Move magnet closer or recalibrate threshold                 |
+
+---
+
+## 💡 Development Tips
+
+* Use `Serial.print()` to debug sensor raw values.
+* Keep alarm loops non-blocking with `millis()` timing.
+* Consider adding:
+
+  * OTA updates
+  * EEPROM logging for alarm history
+  * WiFi support for IoT monitoring
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+Open an issue for bugs or suggestions, and submit pull requests with clear commit messages.
+
+---
+
+## 🧾 License
+
+This project is open-source under the **MIT License**.
+See the LICENSE file for details.
+
+---
+
+## 👨‍💻 Author
+
+**George Lukaanya**
+Embedded Systems & IoT Developer
+*Exploring AI-driven embedded intelligence and safety systems.*
+
